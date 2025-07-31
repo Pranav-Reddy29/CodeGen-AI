@@ -4,8 +4,9 @@ services:
     env: node
     plan: free
     rootDir: server
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: npm ci
+    startCommand: npm start
+    nodeVersion: 18
     envVars:
       - key: NODE_ENV
         value: production
