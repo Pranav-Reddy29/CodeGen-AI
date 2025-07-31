@@ -29,8 +29,9 @@ This guide will help you deploy your CodeGen AI application to Render. We'll dep
    - **Root Directory**: Leave empty (deploy from root)
 
 2. **Build Configuration**
-   - **Build Command**: `cd server && npm install`
-   - **Start Command**: `cd server && npm start`
+   - **Root Directory**: `server`
+   - **Build Command**: `npm install`
+   - **Start Command**: `node server.js`
 
 3. **Environment Variables**
    ```
@@ -84,8 +85,9 @@ If you prefer manual deployment:
 2. **Connect GitHub repository**
 3. **Configure:**
    - **Name**: `codegen-backend`
-   - **Build Command**: `cd server && npm install`
-   - **Start Command**: `cd server && npm start`
+   - **Root Directory**: `server`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
    - **Environment Variables**: (see above)
 
 ### Frontend Service
