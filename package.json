@@ -22,6 +22,9 @@
     "install:all": "npm install && cd server && npm install",
     "build:all": "npm run build && cd server && npm install --production"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
