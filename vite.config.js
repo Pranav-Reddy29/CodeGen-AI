@@ -41,7 +41,7 @@ export default defineConfig({
       }
     }
   },
-  // Base path for GitHub Pages
+  // Base path for Vercel deployment
   base: '/',
   // Static asset handling
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.ico']
