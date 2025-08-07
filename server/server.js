@@ -1,5 +1,4 @@
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -20,39 +19,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Supabase Client (Admin operations) - with fallback for local development
-let supabase;
-const isSupabaseConfigured = process.env.SUPABASE_URL && 
-  process.env.SUPABASE_URL !== 'your-supabase-url' && 
-  process.env.SUPABASE_URL.startsWith('http');
-
-if (isSupabaseConfigured) {
-  try {
-    supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-    console.log('Supabase client created successfully');
-  } catch (error) {
-    console.error('Failed to create Supabase client:', error);
-    supabase = null;
-  }
-} else {
-  console.log('Supabase not configured - using local development mode');
-  // Create a mock supabase client for local development
-  supabase = {
-    from: () => ({
-      select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }) }) }),
-      insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
-      update: () => ({ eq: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }) }),
-      delete: () => ({ eq: () => ({ data: null, error: null }) })
-    })
-  };
-}
-
-// Debug Supabase connection
-console.log('Supabase URL:', process.env.SUPABASE_URL ? 'Set' : 'Missing');
-console.log('Supabase Anon Key:', process.env.SUPABASE_ANON_KEY ? 'Set' : 'Missing');
+// Mock mode for deployment
+console.log('Running in mock mode for deployment');
+const supabase = {
+  from: () => ({
+    select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }) }) }),
+    insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
+    update: () => ({ eq: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }) }),
+    delete: () => ({ eq: () => ({ data: null, error: null }) })
+  })
+};
 
 // Authentication Middleware
 const authenticateToken = async (req, res, next) => {
@@ -66,29 +42,13 @@ const authenticateToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // For local development without Supabase, create a mock user
-    if (!isSupabaseConfigured || !supabase) {
-      req.user = {
-        id: decoded.userId || 'local-user-id',
-        name: 'Local User',
-        email: 'local@example.com'
-      };
-      return next();
-    }
-    
-    // Get user from Supabase
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', decoded.userId)
-      .single();
-
-    if (error || !user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    req.user = user;
-    next();
+    // Mock user for deployment
+    req.user = {
+      id: decoded.userId || 'local-user-id',
+      name: 'Local User',
+      email: 'local@example.com'
+    };
+    return next();
   } catch (error) {
     return res.status(403).json({ error: 'Invalid token' });
   }
@@ -98,25 +58,6 @@ const authenticateToken = async (req, res, next) => {
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      const mockUserId = 'local-user-' + Date.now();
-      const token = jwt.sign(
-        { userId: mockUserId },
-        process.env.JWT_SECRET || 'your-secret-key',
-        { expiresIn: '7d' }
-      );
-
-      return res.status(201).json({
-        user: {
-          id: mockUserId,
-          name,
-          email
-        },
-        token
-      });
-    }
 
     // Check if user already exists
     const { data: existingUser } = await supabase
@@ -180,25 +121,6 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      const mockUserId = 'local-user-' + Date.now();
-      const token = jwt.sign(
-        { userId: mockUserId },
-        process.env.JWT_SECRET || 'your-secret-key',
-        { expiresIn: '7d' }
-      );
-
-      return res.json({
-        user: {
-          id: mockUserId,
-          name: 'Local User',
-          email
-        },
-        token
-      });
-    }
-
     // Find user in Supabase
     const { data: user, error } = await supabase
       .from('users')
@@ -244,16 +166,6 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
   }
 
   try {
-    if (!isSupabaseConfigured || !supabase) {
-      // For local development, just return the updated user
-      return res.json({
-        user: {
-          ...req.user,
-          name,
-        }
-      });
-    }
-
     // Update user in Supabase
     const { data: user, error } = await supabase
       .from('users')
@@ -275,11 +187,6 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
 // Project Routes
 app.get('/api/projects', authenticateToken, async (req, res) => {
   try {
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      return res.json([]);
-    }
-
     const { data: projects, error } = await supabase
       .from('projects')
       .select('*')
@@ -301,22 +208,6 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
 app.post('/api/projects', authenticateToken, async (req, res) => {
   try {
     const { name, description, language, code, tags } = req.body;
-
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      const mockProject = {
-        id: 'local-project-' + Date.now(),
-        user_id: req.user.id,
-        name,
-        description,
-        language,
-        code,
-        tags: tags || [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      return res.status(201).json(mockProject);
-    }
 
     const { data: project, error } = await supabase
       .from('projects')
@@ -349,21 +240,6 @@ app.put('/api/projects/:id', authenticateToken, async (req, res) => {
   try {
     const { name, description, language, code, tags } = req.body;
     
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      const mockProject = {
-        id: req.params.id,
-        user_id: req.user.id,
-        name,
-        description,
-        language,
-        code,
-        tags: tags || [],
-        updated_at: new Date().toISOString()
-      };
-      return res.json(mockProject);
-    }
-    
     const { data: project, error } = await supabase
       .from('projects')
       .update({
@@ -393,11 +269,6 @@ app.put('/api/projects/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
   try {
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      return res.json({ message: 'Project deleted successfully' });
-    }
-
     const { error } = await supabase
       .from('projects')
       .delete()
@@ -419,11 +290,6 @@ app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
 app.get('/api/projects/search', authenticateToken, async (req, res) => {
   try {
     const { query } = req.query;
-    
-    // For local development without Supabase
-    if (!isSupabaseConfigured || !supabase) {
-      return res.json([]);
-    }
     
     const { data: projects, error } = await supabase
       .from('projects')
