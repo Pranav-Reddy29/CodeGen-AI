@@ -5,11 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "npm install"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.9.1",
-    "@supabase/functions-js": "^2.4.5",
     "@supabase/supabase-js": "^2.39.7",
     "bcryptjs": "^2.4.3",
     "cohere-ai": "^4.0.0",
