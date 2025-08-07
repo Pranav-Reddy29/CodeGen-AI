@@ -42,7 +42,7 @@ export default defineConfig({
     }
   },
   // Base path for Vercel deployment
-  base: '/',
+  base: '/CodeGen-AI/',
   // Static asset handling
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.ico']
 }) 
