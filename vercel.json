@@ -1,8 +1,7 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://codegen-ai.onrender.com/api"
+    }
+  }
 }
