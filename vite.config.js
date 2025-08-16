@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -31,7 +30,6 @@ export default defineConfig({
         }
       }
     },
-    // Mobile optimizations
     target: 'es2015',
     minify: 'terser',
     terserOptions: {
@@ -41,8 +39,6 @@ export default defineConfig({
       }
     }
   },
-  // Base path for Vercel deployment
-  base: '/CodeGen-AI/',
-  // Static asset handling
+  // ✅ Removed wrong base: '/CodeGen-AI/'
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.ico']
-}) 
+})
