@@ -1,20 +1,17 @@
 {
   "name": "codegen",
-  "homepage": "https://Pranav-Reddy29.github.io/CodeGen-AI",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "preview": "vite preview",
     "start": "vite preview --port 3000",
     "server:dev": "cd server && npm run dev",
     "server:start": "cd server && npm start",
     "install:all": "npm install && cd server && npm install",
-    "build:all": "npm run build && cd server && npm install --production",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "build:all": "npm run build && cd server && npm install --production"
   },
   "engines": {
     "node": "22.x"
@@ -37,7 +34,6 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
-    "gh-pages": "^6.3.0",
     "postcss": "^8.5.6",
     "postcss-selector-parser": "^7.1.0",
     "sucrase": "^3.35.0",
