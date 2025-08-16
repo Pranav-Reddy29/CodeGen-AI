@@ -1,10 +1,12 @@
-// Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000/api";
+// ================== CONFIG ==================
+// Use environment variable for API URL, fallback to localhost for dev
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000/api";
 
-// Helper function to get auth token
+// Helper: get auth token from localStorage
 const getAuthToken = () => localStorage.getItem("authToken");
 
-// Helper function to make API requests
+// Core API request handler
 const apiRequest = async (endpoint, options = {}) => {
   const token = getAuthToken();
 
@@ -12,7 +14,7 @@ const apiRequest = async (endpoint, options = {}) => {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
   };
@@ -24,7 +26,7 @@ const apiRequest = async (endpoint, options = {}) => {
       let errorMsg = `HTTP error! status: ${response.status}`;
       try {
         const errorData = await response.json();
-        errorMsg = errorData.error || errorMsg;
+        errorMsg = errorData.error || errorData.message || errorMsg;
       } catch {
         const text = await response.text();
         if (text) errorMsg = text;
@@ -32,9 +34,12 @@ const apiRequest = async (endpoint, options = {}) => {
       throw new Error(errorMsg);
     }
 
+    // Handle empty responses (e.g., DELETE)
+    if (response.status === 204) return null;
+
     return await response.json();
   } catch (error) {
-    console.error("API request failed:", error);
+    console.error(`API request failed: ${endpoint}`, error);
     throw error;
   }
 };

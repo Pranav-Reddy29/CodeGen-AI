@@ -4,10 +4,13 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'process.env': {} // helps avoid undefined process.env in browser
+  },
   server: {
     port: 5173,
-    open: false,
-    host: '127.0.0.1'
+    host: '127.0.0.1',
+    open: false
   },
   resolve: {
     alias: {
@@ -17,10 +20,8 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom'],
     esbuildOptions: {
-      loader: {
-        '.js': 'jsx',
-      },
-    },
+      loader: { '.js': 'jsx' }
+    }
   },
   build: {
     rollupOptions: {
@@ -39,7 +40,6 @@ export default defineConfig({
       }
     }
   },
-  // For Vercel deployment
   base: '/',
   assetsInclude: [
     '**/*.png', '**/*.jpg', '**/*.jpeg',
