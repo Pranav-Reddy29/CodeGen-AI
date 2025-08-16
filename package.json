@@ -10,9 +10,8 @@
     "postinstall": "node -e \"if(process.platform !== 'win32'){require('child_process').execSync('chmod +x node_modules/.bin/vite')}\""
   },
   "engines": {
-  "node": "18.x"
-},
-
+    "node": "22.x"
+  },
   "dependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.21",
