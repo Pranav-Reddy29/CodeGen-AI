@@ -1,28 +1,21 @@
 {
-  "name": "codegen",
-  "version": "0.1.0",
+  "name": "codegen-frontend",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "start": "vite preview --port 3000",
-    "server:dev": "cd server && npm run dev",
-    "server:start": "cd server && npm start",
-    "install:all": "npm install && cd server && npm install",
-    "build:all": "npm run build && cd server && npm install --production"
+    "preview": "vite preview --port 3000"
   },
   "engines": {
     "node": "20.x"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.7.0",
-    "autoprefixer": "^10.4.21",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "lucide-react": "^0.525.0",
-    "postcss": "^8.5.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0",
@@ -32,14 +25,12 @@
   "devDependencies": {
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
-    "caniuse-lite": "^1.0.30001731",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
-    "postcss-selector-parser": "^7.1.0",
-    "rollup": "^4.46.2",
-    "sucrase": "^3.35.0",
+    "postcss": "^8.5.6",
+    "autoprefixer": "^10.4.21",
     "terser": "^5.43.1"
   }
 }

@@ -1,100 +1,95 @@
 // Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000/api";
 
 // Helper function to get auth token
-const getAuthToken = () => {
-  return localStorage.getItem('authToken');
-};
+const getAuthToken = () => localStorage.getItem("authToken");
 
 // Helper function to make API requests
 const apiRequest = async (endpoint, options = {}) => {
   const token = getAuthToken();
-  
+
   const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(options.headers || {}),
+    },
   };
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      let errorMsg = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.error || errorMsg;
+      } catch {
+        const text = await response.text();
+        if (text) errorMsg = text;
+      }
+      throw new Error(errorMsg);
     }
-    
+
     return await response.json();
   } catch (error) {
-    console.error('API request failed:', error);
+    console.error("API request failed:", error);
     throw error;
   }
 };
 
-// Auth API
+// ================== AUTH API ==================
 export const authAPI = {
-  signup: async (userData) => {
-    return apiRequest('/auth/signup', {
-      method: 'POST',
+  signup: (userData) =>
+    apiRequest("/auth/signup", {
+      method: "POST",
       body: JSON.stringify(userData),
-    });
-  },
+    }),
 
-  login: async (credentials) => {
-    return apiRequest('/auth/login', {
-      method: 'POST',
+  login: (credentials) =>
+    apiRequest("/auth/login", {
+      method: "POST",
       body: JSON.stringify(credentials),
-    });
-  },
+    }),
 
-  updateProfile: async (profileData) => {
-    return apiRequest('/auth/profile', {
-      method: 'PUT',
+  updateProfile: (profileData) =>
+    apiRequest("/auth/profile", {
+      method: "PUT",
       body: JSON.stringify(profileData),
-    });
-  },
+    }),
 };
 
-// Projects API
+// ================== PROJECTS API ==================
 export const projectsAPI = {
-  getAll: async () => {
-    return apiRequest('/projects');
-  },
+  getAll: () => apiRequest("/projects"),
 
-  create: async (projectData) => {
-    return apiRequest('/projects', {
-      method: 'POST',
+  create: (projectData) =>
+    apiRequest("/projects", {
+      method: "POST",
       body: JSON.stringify(projectData),
-    });
-  },
+    }),
 
-  update: async (projectId, updates) => {
-    return apiRequest(`/projects/${projectId}`, {
-      method: 'PUT',
+  update: (projectId, updates) =>
+    apiRequest(`/projects/${projectId}`, {
+      method: "PUT",
       body: JSON.stringify(updates),
-    });
-  },
+    }),
 
-  delete: async (projectId) => {
-    return apiRequest(`/projects/${projectId}`, {
-      method: 'DELETE',
-    });
-  },
+  delete: (projectId) =>
+    apiRequest(`/projects/${projectId}`, {
+      method: "DELETE",
+    }),
 
-  search: async (query) => {
-    return apiRequest(`/projects/search?query=${encodeURIComponent(query)}`);
-  },
+  search: (query) =>
+    apiRequest(`/projects/search?query=${encodeURIComponent(query)}`),
 };
 
-// AI Code Generation API
+// ================== AI CODE GENERATION API ==================
 export const aiAPI = {
-  generateCode: async (prompt, language, projectType) => {
-    return apiRequest('/generate', {
-      method: 'POST',
+  generateCode: (prompt, language, projectType) =>
+    apiRequest("/generate", {
+      method: "POST",
       body: JSON.stringify({ prompt, language, projectType }),
-    });
-  },
-}; 
+    }),
+};

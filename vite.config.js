@@ -39,6 +39,10 @@ export default defineConfig({
       }
     }
   },
-  // ✅ Removed wrong base: '/CodeGen-AI/'
-  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.ico']
+  // For Vercel deployment
+  base: '/',
+  assetsInclude: [
+    '**/*.png', '**/*.jpg', '**/*.jpeg',
+    '**/*.gif', '**/*.svg', '**/*.ico'
+  ]
 })
