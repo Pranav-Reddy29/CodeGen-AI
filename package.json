@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "start": "vite preview --port 3000",
-    "server:dev": "cd server && npm run dev",
-    "server:start": "cd server && npm start",
-    "install:all": "npm install && cd server && npm install",
-    "build:all": "npm run build && cd server && npm install --production"
-  },
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "start": "vite preview --port 3000",
+  "server:dev": "cd server && npm run dev",
+  "server:start": "cd server && npm start",
+  "install:all": "npm install && cd server && npm install",
+  "build:all": "npm run build && cd server && npm install --production"
+},
   "engines": {
     "node": "20.x"
   },
