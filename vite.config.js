@@ -20,5 +20,5 @@ export default defineConfig({
       },
     },
   },
-  base: '/', // required for Vercel
+  base: '/CodeGen-AI/', // GitHub Pages requires repo name as base
 })
