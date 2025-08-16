@@ -5,10 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "preview": "vite preview",
-    "postinstall": "chmod +x node_modules/.bin/vite"
+    "postinstall": "node -e \"if(process.platform !== 'win32'){require('child_process').execSync('chmod +x node_modules/.bin/vite')}\""
   },
+  "engines": {
+  "node": "18.x"
+},
+
   "dependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.21",
