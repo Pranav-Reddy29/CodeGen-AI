@@ -11,7 +11,8 @@
     "server:dev": "cd server && npm run dev",
     "server:start": "cd server && npm start",
     "install:all": "npm install && cd server && npm install",
-    "build:all": "npm run build && cd server && npm install --production"
+    "build:all": "npm run build && cd server && npm install --production",
+    "postinstall": "npm install vite"
   },
   "engines": {
     "node": "20.x"
