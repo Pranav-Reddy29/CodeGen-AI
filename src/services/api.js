@@ -6,6 +6,9 @@ const API_BASE_URL =
 // Helper: get auth token from localStorage
 const getAuthToken = () => localStorage.getItem("authToken");
 
+// Helper: save auth token to localStorage
+const setAuthToken = (token) => localStorage.setItem("authToken", token);
+
 // Core API request handler
 const apiRequest = async (endpoint, options = {}) => {
   const token = getAuthToken();
@@ -46,17 +49,25 @@ const apiRequest = async (endpoint, options = {}) => {
 
 // ================== AUTH API ==================
 export const authAPI = {
-  signup: (userData) =>
-    apiRequest("/auth/signup", {
+  signup: async (userData) => {
+    const res = await apiRequest("/auth/signup", {
       method: "POST",
       body: JSON.stringify(userData),
-    }),
+    });
+    setAuthToken(res.token); // Save token after signup
+    return res;
+  },
 
-  login: (credentials) =>
-    apiRequest("/auth/login", {
+  login: async (credentials) => {
+    const res = await apiRequest("/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
-    }),
+    });
+    setAuthToken(res.token); // Save token after login
+    return res;
+  },
+
+  logout: () => localStorage.removeItem("authToken"), // Optional logout
 
   updateProfile: (profileData) =>
     apiRequest("/auth/profile", {

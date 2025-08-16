@@ -8,11 +8,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ==================== MOCK PASSWORD FUNCTIONS ====================
-const mockHashPassword = (password) => `mock-hashed-${password}-${Date.now()}`;
-const mockComparePassword = (password, hash) => password === 'password123';
+const mockHashPassword = (password) => `mock-hashed-${password}`;
+const mockComparePassword = (password, hash) => hash === `mock-hashed-${password}`;
+
+// ==================== IN-MEMORY USERS STORE ====================
+const users = [];
 
 // ==================== CORS CONFIG ====================
-// Allow GitHub Pages + localhost origins
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
@@ -52,29 +54,63 @@ const authenticateToken = (req, res, next) => {
 // ==================== AUTH ROUTES ====================
 app.post('/api/auth/signup', async (req, res) => {
   const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Name, email, and password are required' });
+  }
+
+  // Check if user already exists
+  if (users.find(u => u.email === email)) {
+    return res.status(400).json({ error: 'User already exists' });
+  }
+
   const hashedPassword = mockHashPassword(password);
   const user = { id: Date.now().toString(), name, email, password: hashedPassword };
+
+  users.push(user); // Save user in memory
+
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '7d' });
+
   res.status(201).json({ user: { id: user.id, name: user.name, email: user.email }, token });
 });
 
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
-  if (password !== 'password123') return res.status(400).json({ error: 'Invalid credentials' });
-  const user = { id: 'local-user-id', name: 'Local User', email };
+  const user = users.find(u => u.email === email);
+
+  if (!user || !mockComparePassword(password, user.password)) {
+    return res.status(400).json({ error: 'Invalid credentials' });
+  }
+
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '7d' });
-  res.json({ user, token });
+
+  res.json({ user: { id: user.id, name: user.name, email: user.email }, token });
+});
+
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: 'Name is required' });
+  res.json({ user: { ...req.user, name } });
 });
 
 // ==================== PROJECT ROUTES ====================
-app.get('/api/projects', authenticateToken, async (req, res) => res.json([]));
+app.get('/api/projects', authenticateToken, async (req, res) => {
+  res.json([]); // Mock empty project list
+});
+
 app.post('/api/projects', authenticateToken, async (req, res) => {
   const { name } = req.body;
   const project = { id: Date.now().toString(), user_id: req.user.id, name };
   res.status(201).json(project);
 });
-app.put('/api/projects/:id', authenticateToken, async (req, res) => res.json({ id: req.params.id, ...req.body }));
-app.delete('/api/projects/:id', authenticateToken, async (req, res) => res.json({ message: 'Project deleted successfully' }));
+
+app.put('/api/projects/:id', authenticateToken, async (req, res) => {
+  res.json({ id: req.params.id, ...req.body });
+});
+
+app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
+  res.json({ message: 'Project deleted successfully' });
+});
 
 // ==================== AI CODE GENERATION ====================
 app.post('/api/generate', authenticateToken, async (req, res) => {
