@@ -34,16 +34,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// ==================== MOCK SUPABASE ====================
-const supabase = {
-  from: () => ({
-    select: () => ({ eq: () => ({ single: async () => ({ data: null, error: null }) }) }),
-    insert: () => ({ select: () => ({ single: async () => ({ data: null, error: null }) }) }),
-    update: () => ({ eq: () => ({ select: () => ({ single: async () => ({ data: null, error: null }) }) }) }),
-    delete: () => ({ eq: () => ({ data: null, error: null }) })
-  })
-};
-
 // ==================== AUTH MIDDLEWARE ====================
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -63,50 +53,28 @@ const authenticateToken = (req, res, next) => {
 app.post('/api/auth/signup', async (req, res) => {
   const { name, email, password } = req.body;
   const hashedPassword = mockHashPassword(password);
-
-  // Mock user creation
   const user = { id: Date.now().toString(), name, email, password: hashedPassword };
-
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '7d' });
-
   res.status(201).json({ user: { id: user.id, name: user.name, email: user.email }, token });
 });
 
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
-  // Mock validation
   if (password !== 'password123') return res.status(400).json({ error: 'Invalid credentials' });
-
   const user = { id: 'local-user-id', name: 'Local User', email };
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '7d' });
-
   res.json({ user, token });
 });
 
-app.put('/api/auth/profile', authenticateToken, async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.status(400).json({ error: 'Name is required' });
-  res.json({ user: { ...req.user, name } });
-});
-
 // ==================== PROJECT ROUTES ====================
-app.get('/api/projects', authenticateToken, async (req, res) => {
-  res.json([]); // Mock empty project list
-});
-
+app.get('/api/projects', authenticateToken, async (req, res) => res.json([]));
 app.post('/api/projects', authenticateToken, async (req, res) => {
   const { name } = req.body;
   const project = { id: Date.now().toString(), user_id: req.user.id, name };
   res.status(201).json(project);
 });
-
-app.put('/api/projects/:id', authenticateToken, async (req, res) => {
-  res.json({ id: req.params.id, ...req.body });
-});
-
-app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
-  res.json({ message: 'Project deleted successfully' });
-});
+app.put('/api/projects/:id', authenticateToken, async (req, res) => res.json({ id: req.params.id, ...req.body }));
+app.delete('/api/projects/:id', authenticateToken, async (req, res) => res.json({ message: 'Project deleted successfully' }));
 
 // ==================== AI CODE GENERATION ====================
 app.post('/api/generate', authenticateToken, async (req, res) => {
